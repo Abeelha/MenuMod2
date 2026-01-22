@@ -213,11 +213,11 @@ namespace MenuMod2
                 if (character.Info != null && !string.IsNullOrEmpty(character.Info.Name))
                 {
                      MenuMod2Menu thisCharMenu = new MenuMod2Menu(character.Info.Name, charsLevelMenu);
-                     thisCharMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(character, 1, 10));
-                     thisCharMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(character, 5, 10));
-                     thisCharMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(character, -1, 10));
-                     thisCharMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(character, -5, 10));
-                     thisCharMenu.addButton("Max Level (10)", () => Cheats.modifyGearLevel(character, 10, 10));
+                     thisCharMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(character, 1, 30));
+                     thisCharMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(character, 5, 30));
+                     thisCharMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(character, -1, 30));
+                     thisCharMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(character, -5, 30));
+                     thisCharMenu.addButton("Max Level (30)", () => Cheats.modifyGearLevel(character, 30, 30));
                 }
             }
 
