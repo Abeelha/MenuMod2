@@ -239,6 +239,33 @@ namespace MenuMod2
                     specificGearAllUpgrades.addButton(gearInfo.Name, () => Cheats.giveAllUpgradesForGear(gear)).changeColour(color);
                 }
             }
+
+            MenuMod2Menu specificGearAllSkins = new MenuMod2Menu("Specific Gear all skins", Upgrades);
+            foreach (var gear in allGear)
+            {
+                 var gearInfo = gear.Info;
+                 if (gearInfo != null && gearInfo.Upgrades.Count > 0)
+                 {
+                      bool hasCosmetics = false;
+                      foreach(var up in gearInfo.Upgrades)
+                      {
+                          if(up.UpgradeType == Upgrade.Type.Cosmetic)
+                          {
+                              hasCosmetics = true;
+                              break;
+                          }
+                      }
+
+                      if(hasCosmetics)
+                      {
+                           Color color = Color.red;
+                           if (PlayerData.GetGearData(gear).IsUnlocked)
+                                color = Color.green;
+
+                           specificGearAllSkins.addButton(gearInfo.Name, () => Cheats.giveAllCosmeticsForGear(gear)).changeColour(color);
+                      }
+                 }
+            }
         }
         public static List<T> GetItemsFromWeightedArray<T>(object weightedArray)
         {

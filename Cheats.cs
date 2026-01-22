@@ -142,6 +142,24 @@ namespace MenuMod2
             SendTextChatMessageToClient($"All upgrades for {gear.Info.Name} unlocked.");
         }
 
+        public static void giveAllCosmeticsForGear(IUpgradable gear, MM2Button b = null)
+        {
+            if (gear == null || gear.Info == null) return;
+            const string debugPattern = @"(_test_|_dev_|_wip|debug|temp|placeholder|todo|_old|_backup|_copy|\.skinasset$|^test_)";
+            foreach (var upgrade in gear.Info.Upgrades)
+            {
+                 if (upgrade.UpgradeType == Upgrade.Type.Cosmetic &&
+                     upgrade.ExcludeFromWorldPool == false &&
+                     !Regex.IsMatch(upgrade.Name, debugPattern, RegexOptions.IgnoreCase))
+                {
+                    var iUpgrade = new UpgradeInstance(upgrade, gear);
+                    PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
+                    iUpgrade.Unlock(true);
+                }
+            }
+            SendTextChatMessageToClient($"All cosmetics for {gear.Info.Name} unlocked.");
+        }
+
         public static void giveMissingUpgrades(MM2Button b = null)
         {
 
