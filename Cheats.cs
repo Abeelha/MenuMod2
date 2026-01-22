@@ -41,7 +41,7 @@ namespace MenuMod2
         {
             const string debugPattern = @"(_test_|_dev_|_wip|debug|temp|placeholder|todo|_old|_backup|_copy|\.skinasset$|^test_)";
             //TODO: this are not all cosmetics items available, we are missing Gun Crab - Roacher (for playing demo before release, I would exclude it)
-            //and Gun Crab - Eyes since they are excluded from 
+            //and Gun Crab - Eyes since they are excluded from
             foreach (var gear in Global.Instance.AllGear)
             {
                 var gearInfo = gear.Info;
@@ -49,7 +49,7 @@ namespace MenuMod2
                 {
                     if (upgrade.UpgradeType != Upgrade.Type.Cosmetic ||
                         upgrade.ExcludeFromWorldPool != false ||
-                        Regex.IsMatch(upgrade.Name, debugPattern, RegexOptions.IgnoreCase)) 
+                        Regex.IsMatch(upgrade.Name, debugPattern, RegexOptions.IgnoreCase))
                         continue;
                     var iUpgrade = new UpgradeInstance(upgrade, gear);
                     PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
@@ -65,14 +65,81 @@ namespace MenuMod2
                     if (upgrade.UpgradeType != Upgrade.Type.Cosmetic ||
                         Regex.IsMatch(upgrade.Name, debugPattern, RegexOptions.IgnoreCase))
                         continue;
-                    
+
                     var iUpgrade = new UpgradeInstance(upgrade, gear);
                     PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
                     iUpgrade.Unlock(true);
                 }
             }
-            
+
             SendTextChatMessageToClient("All cosmetics for characters and weapons are added silently.");
+            SendTextChatMessageToClient("All cosmetics for characters and weapons are added silently.");
+        }
+
+        public static void giveResource(PlayerResource resource, int amount, MM2Button b = null)
+        {
+            if (resource == null) return;
+            if (amount > 0)
+            {
+                PlayerData.Instance.AddResource(resource, amount);
+            }
+            else
+            {
+                // AddResource handles negative values as subtraction, but let's be safe and check bounds if needed.
+                // The game's AddResource likely handles clamping.
+                 PlayerData.Instance.AddResource(resource, amount);
+            }
+        }
+
+        public static void giveAllGearUpgrades(MM2Button b = null)
+        {
+            foreach (var gear in Global.Instance.AllGear)
+            {
+                var gearInfo = gear.Info;
+                foreach (var upgrade in gearInfo.Upgrades)
+                {
+                    if (upgrade.UpgradeType != Upgrade.Type.Invalid && upgrade.UpgradeType != Upgrade.Type.Cosmetic)
+                    {
+                        var iUpgrade = new UpgradeInstance(upgrade, gear);
+                        PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
+                        iUpgrade.Unlock(true);
+                    }
+                }
+            }
+            SendTextChatMessageToClient("All upgrades for weapons/items are added silently.");
+        }
+
+        public static void giveAllCharacterUpgrades(MM2Button b = null)
+        {
+             foreach (var character in Global.Instance.Characters)
+            {
+                var gearInfo = character.Info;
+                foreach (var upgrade in gearInfo.Upgrades)
+                {
+                    if (upgrade.UpgradeType != Upgrade.Type.Invalid && upgrade.UpgradeType != Upgrade.Type.Cosmetic)
+                    {
+                        var iUpgrade = new UpgradeInstance(upgrade, character);
+                        PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
+                        iUpgrade.Unlock(true);
+                    }
+                }
+            }
+            SendTextChatMessageToClient("All upgrades for characters are added silently.");
+        }
+
+        public static void giveAllUpgradesForGear(IUpgradable gear, MM2Button b = null)
+        {
+            if (gear == null || gear.Info == null) return;
+            foreach (var upgrade in gear.Info.Upgrades)
+            {
+                 if (upgrade.UpgradeType != Upgrade.Type.Invalid && upgrade.UpgradeType != Upgrade.Type.Cosmetic)
+                {
+                    var iUpgrade = new UpgradeInstance(upgrade, gear);
+                    PlayerData.CollectInstance(iUpgrade, PlayerData.UnlockFlags.Hidden);
+                    iUpgrade.Unlock(true);
+                }
+            }
+            SendTextChatMessageToClient($"All upgrades for {gear.Info.Name} unlocked.");
         }
 
         public static void giveMissingUpgrades(MM2Button b = null)
@@ -119,11 +186,11 @@ namespace MenuMod2
             foreach (var gear in Global.Instance.AllGear)
             {
                 GearInfo gearInfo = gear.Info;
-                if (gearInfo == null || !gearInfo.HasUpgradeGrid || gearInfo.Upgrades.Count() == 0) continue;
+                if (gearInfo == null || !gearInfo.HasUpgradeGrid || gearInfo.Upgrades.Count == 0) continue;
                 var gearName = gearInfo.Name;
                 MenuMod2.Logger.LogInfo($"Gear: {gearName}");
                 var allUpgrades = gearInfo.Upgrades;
-                if (allUpgrades == null || allUpgrades.Length == 0) continue;
+                if (allUpgrades == null || allUpgrades.Count == 0) continue;
                 foreach (var upgrade in allUpgrades)
                 {
                     if (upgrade.UpgradeType == Upgrade.Type.Invalid || upgrade.UpgradeType == Upgrade.Type.Cosmetic) continue;
@@ -523,9 +590,12 @@ namespace MenuMod2
         }
         public static void loadMission(Mission mission, WorldRegion region, MM2Button b = null)
         {
+            /* BROKEN
             //public MissionData(int seed, Mission mission, WorldRegion region, string scene, MissionContainer container)
             MissionData missionData = new MissionData(MissionManager.MissionSeed, mission, region, region.SceneNames[0], Global.Instance.DefaultMissionContainer); // TODO fix random seed
             DropPod.SetMission(missionData);
+            */
+            SendTextChatMessageToClient("Load Mission is currently broken and disabled.");
         }
         public static void giveAllResoruces(MM2Button b = null)
         {
@@ -585,7 +655,7 @@ namespace MenuMod2
                 {
                     MenuMod2.Logger.LogInfo($"Unlocking skill {upgrade.Upgrade.Name} for {employee.name}");
                     UpgradeInstance upgradeInstance = PlayerData.CollectInstance(employee, upgrade.Upgrade, PlayerData.UnlockFlags.None);
-                    upgradeInstance.Seed = upgrade.Upgrade.ID;
+                    upgradeInstance.Seed = upgrade.Upgrade.ID.GetHashCode();
                     upgradeInstance.Unlock(false);
                     PlayerData instance = PlayerData.Instance;
                     int totalSkillPointsSpent = instance.TotalSkillPointsSpent;
@@ -615,7 +685,7 @@ namespace MenuMod2
                     }
                     MenuMod2.Logger.LogInfo($"Unlocking skill {upgrade.Upgrade.Name} for {employee.name}");
                     UpgradeInstance upgradeInstance = PlayerData.CollectInstance(employee, upgrade.Upgrade, PlayerData.UnlockFlags.None);
-                    upgradeInstance.Seed = upgrade.Upgrade.ID;
+                    upgradeInstance.Seed = upgrade.Upgrade.ID.GetHashCode();
                     upgradeInstance.Unlock(false);
                     PlayerData instance = PlayerData.Instance;
                     int totalSkillPointsSpent = instance.TotalSkillPointsSpent;

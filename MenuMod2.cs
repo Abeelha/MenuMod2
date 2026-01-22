@@ -40,12 +40,14 @@ namespace MenuMod2
             int profileIndex = (int)field.GetValue(PlayerData.ProfileConfig.Instance);
             if (EnemyManager.Instance != null)
             {
+                /*
                 if (profileIndex == 0)
                 {
                     Logger.LogWarning($"Using default profile is not supported.  Please switch to a different profile on the main menu.");
                     _actionmap.Disable();
                     return;
                 }
+                */
                 createMainMenu();
             }
         }
@@ -56,7 +58,7 @@ namespace MenuMod2
             Logger = base.Logger;
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
             _actionmap = new InputActionMap("MenuMod2");
-            _openMenu = _actionmap.AddAction("openMenu", binding: "<Keyboard>/backquote");
+            _openMenu = _actionmap.AddAction("openMenu", binding: "<Keyboard>/insert");
             _openMenu.performed += ctx => toggleMenu();
             _actionmap.Enable();
             var harmony = new Harmony("com.SlideDrum.menumod2");
@@ -170,7 +172,20 @@ namespace MenuMod2
             MenuMod2Menu Upgrades = new MenuMod2Menu("Upgrades", inventory);
             MenuMod2Menu unlockWeapon = new MenuMod2Menu("Unlock weapon", inventory);
             MenuMod2Menu levelup = new MenuMod2Menu("Levels", inventory);
-            inventory.addButton("Give max resources", () => Cheats.giveAllResoruces());
+            MenuMod2Menu resourceMenu = new MenuMod2Menu("Resources", inventory);
+            var allResources = Global.Instance.PlayerResources;
+            foreach (var resource in allResources)
+            {
+                MenuMod2Menu thisResMenu = new MenuMod2Menu(resource.name, resourceMenu);
+                thisResMenu.addButton("+1", () => Cheats.giveResource(resource, 1));
+                thisResMenu.addButton("+10", () => Cheats.giveResource(resource, 10));
+                thisResMenu.addButton("-10", () => Cheats.giveResource(resource, -10));
+                thisResMenu.addButton("+100", () => Cheats.giveResource(resource, 100));
+                thisResMenu.addButton("-100", () => Cheats.giveResource(resource, -100));
+                thisResMenu.addButton("+1000", () => Cheats.giveResource(resource, 1000));
+                thisResMenu.addButton("Give Max", () => Cheats.giveResource(resource, resource.Max));
+            }
+
             Upgrades.addButton("Give one of each upgrade", () => Cheats.giveAllUpgrades());
             Upgrades.addButton("Give one of each cosmetic", () => Cheats.giveAllCosmetics());
             Upgrades.addButton("Give missing upgrades", () => Cheats.giveMissingUpgrades());
@@ -185,7 +200,7 @@ namespace MenuMod2
             foreach (var gear in allGear)
             {
                 var gearInfo = gear.Info;
-                if (gearInfo.Upgrades.Length > 0)
+                if (gearInfo.Upgrades.Count > 0)
                 {
                     var upgradeMenu = new MenuMod2Menu(gearInfo.Name, spesificUpgradeType);
                     Color color = Color.red;
@@ -198,6 +213,10 @@ namespace MenuMod2
                         button = unlockWeapon.addButton(gearInfo.Name, () => Cheats.unlockGear(gear, button)).changeColour(color);
                     }
                     upgradeMenus.Add(upgradeMenu);
+
+                    // Added per-item "Unlock All" button
+                    upgradeMenu.addButton("Unlock All For This Item", () => Cheats.giveAllUpgradesForGear(gear)).changeColour(Color.green);
+
                     foreach (var upgrade in gearInfo.Upgrades)
                     {
                         if (upgrade.UpgradeType == Upgrade.Type.Normal)
@@ -290,6 +309,7 @@ namespace MenuMod2
 
     }
 
+    /*
     [HarmonyPatch(typeof(MissionContainer), nameof(MissionContainer.GetAdditionalModifiers))]
     class MissionContainerPatch
     {
@@ -330,4 +350,5 @@ namespace MenuMod2
             }
         }
     }
+    */
 }
