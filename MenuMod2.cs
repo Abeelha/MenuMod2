@@ -240,6 +240,21 @@ namespace MenuMod2
                 }
             }
 
+            foreach (var character in Global.Instance.Characters)
+            {
+                var charInfo = character.Info;
+                if (charInfo != null && charInfo.Upgrades.Count > 0)
+                {
+                    Color color = Color.red;
+                    if (PlayerData.GetGearData(character).IsUnlocked)
+                         color = Color.green;
+                    else if (PlayerData.GetGearData(character).IsCollected)
+                         color = Color.yellow;
+
+                    specificGearAllUpgrades.addButton(charInfo.Name, () => Cheats.giveAllUpgradesForGear(character)).changeColour(color);
+                }
+            }
+
             MenuMod2Menu specificGearAllSkins = new MenuMod2Menu("Specific Gear all skins", Upgrades);
             foreach (var gear in allGear)
             {
@@ -263,6 +278,32 @@ namespace MenuMod2
                                 color = Color.green;
 
                            specificGearAllSkins.addButton(gearInfo.Name, () => Cheats.giveAllCosmeticsForGear(gear)).changeColour(color);
+                      }
+                 }
+            }
+
+            foreach (var character in Global.Instance.Characters)
+            {
+                 var charInfo = character.Info;
+                 if (charInfo != null && charInfo.Upgrades.Count > 0)
+                 {
+                      bool hasCosmetics = false;
+                      foreach(var up in charInfo.Upgrades)
+                      {
+                          if(up.UpgradeType == Upgrade.Type.Cosmetic)
+                          {
+                              hasCosmetics = true;
+                              break;
+                          }
+                      }
+
+                      if(hasCosmetics)
+                      {
+                           Color color = Color.red;
+                           if (PlayerData.GetGearData(character).IsUnlocked)
+                                color = Color.green;
+
+                           specificGearAllSkins.addButton(charInfo.Name, () => Cheats.giveAllCosmeticsForGear(character)).changeColour(color);
                       }
                  }
             }
