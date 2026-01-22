@@ -641,6 +641,28 @@ namespace MenuMod2
                 }
             }
         }
+
+        public static void modifyGearLevel(IUpgradable gear, int amount, int maxLevel, MM2Button b = null)
+        {
+            if (gear == null) return;
+            var gearData = PlayerData.GetGearData(gear);
+            if (!gearData.IsUnlocked) return;
+
+            MenuMod2.Logger.LogInfo($"Modifying level for {gear.Info.Name} by {amount}");
+
+            var levelField = gearData.GetType().GetField("level", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (levelField != null)
+            {
+                int currentLevel = (int)levelField.GetValue(gearData);
+                int newLevel = currentLevel + amount;
+
+                newLevel = Math.Max(1, Math.Min(newLevel, maxLevel));
+
+                levelField.SetValue(gearData, newLevel);
+                SendTextChatMessageToClient($"{gear.Info.Name} is now Level {newLevel}");
+            }
+        }
+
         public static void giveAllSkills(MM2Button b = null)
         {
             var allCharicters = Global.Instance.Characters;
@@ -713,6 +735,6 @@ namespace MenuMod2
                 return;
             }
             EnemyManager.Instance.SpawnEnemy_Server(pos, enemyClassGroup);
-        }
     }
+}
 }
