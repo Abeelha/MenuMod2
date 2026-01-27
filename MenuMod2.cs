@@ -171,6 +171,13 @@ namespace MenuMod2
             MenuMod2Menu Skills = new MenuMod2Menu("Skills", inventory);
             MenuMod2Menu Upgrades = new MenuMod2Menu("Upgrades", inventory);
             MenuMod2Menu unlockWeapon = new MenuMod2Menu("Unlock weapon", inventory);
+            foreach (var gear in Global.Instance.AllGear)
+            {
+                if (gear.Info != null && !string.IsNullOrEmpty(gear.Info.Name))
+                {
+                     unlockWeapon.addButton(gear.Info.Name, () => Cheats.unlockGear(gear));
+                }
+            }
             MenuMod2Menu levelup = new MenuMod2Menu("Levels", inventory);
             MenuMod2Menu resourceMenu = new MenuMod2Menu("Resources", inventory);
             var allResources = Global.Instance.PlayerResources;
@@ -196,13 +203,14 @@ namespace MenuMod2
             {
                 if (gear.Info != null && !string.IsNullOrEmpty(gear.Info.Name))
                 {
-                     MenuMod2Menu thisWeaponMenu = new MenuMod2Menu(gear.Info.Name, weaponsLevelMenu);
-                     thisWeaponMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(gear, 1, 30));
-                     thisWeaponMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(gear, 5, 30));
-                     thisWeaponMenu.addButton("+10 Levels", () => Cheats.modifyGearLevel(gear, 10, 30));
-                     thisWeaponMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(gear, -1, 30));
-                     thisWeaponMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(gear, -5, 30));
-                     thisWeaponMenu.addButton("-10 Levels", () => Cheats.modifyGearLevel(gear, -10, 30));
+                     MenuMod2Menu thisWeaponMenu = new MenuMod2Menu(gear.Info.Name + "_Levels", weaponsLevelMenu);
+                     thisWeaponMenu.thisButton.changeName(gear.Info.Name);
+                     thisWeaponMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(gear, 1, 999));
+                     thisWeaponMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(gear, 5, 999));
+                     thisWeaponMenu.addButton("+10 Levels", () => Cheats.modifyGearLevel(gear, 10, 999));
+                     thisWeaponMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(gear, -1, 999));
+                     thisWeaponMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(gear, -5, 999));
+                     thisWeaponMenu.addButton("-10 Levels", () => Cheats.modifyGearLevel(gear, -10, 999));
                      thisWeaponMenu.addButton("Max Level (30)", () => Cheats.modifyGearLevel(gear, 30, 30));
                 }
             }
@@ -212,12 +220,61 @@ namespace MenuMod2
             {
                 if (character.Info != null && !string.IsNullOrEmpty(character.Info.Name))
                 {
-                     MenuMod2Menu thisCharMenu = new MenuMod2Menu(character.Info.Name, charsLevelMenu);
-                     thisCharMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(character, 1, 30));
-                     thisCharMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(character, 5, 30));
-                     thisCharMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(character, -1, 30));
-                     thisCharMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(character, -5, 30));
+                     MenuMod2Menu thisCharMenu = new MenuMod2Menu(character.Info.Name + "_Levels", charsLevelMenu);
+                     thisCharMenu.thisButton.changeName(character.Info.Name);
+                     thisCharMenu.addButton("+1 Level", () => Cheats.modifyGearLevel(character, 1, 999));
+                     thisCharMenu.addButton("+5 Levels", () => Cheats.modifyGearLevel(character, 5, 999));
+                     thisCharMenu.addButton("-1 Level", () => Cheats.modifyGearLevel(character, -1, 999));
+                     thisCharMenu.addButton("-5 Levels", () => Cheats.modifyGearLevel(character, -5, 999));
                      thisCharMenu.addButton("Max Level (30)", () => Cheats.modifyGearLevel(character, 30, 30));
+                }
+            }
+
+            MenuMod2Menu specificUpgradeSelect = new MenuMod2Menu("Specific Upgrade Select", Upgrades);
+            foreach (var gear in Global.Instance.AllGear)
+            {
+                if (gear.Info != null && gear.Info.Upgrades.Count > 0)
+                {
+                    MenuMod2Menu gearMenu = new MenuMod2Menu(gear.Info.Name + "_SelectUpgrade", specificUpgradeSelect);
+                    gearMenu.thisButton.changeName(gear.Info.Name);
+
+                    Color color = Color.red;
+                    if (PlayerData.GetGearData(gear).IsUnlocked)
+                        color = Color.green;
+                    else if (PlayerData.GetGearData(gear).IsCollected)
+                        color = Color.yellow;
+                    gearMenu.addButton("Give All Upgrades", () => Cheats.giveAllUpgradesForGear(gear)).changeColour(color);
+
+                    foreach (var upgrade in gear.Info.Upgrades)
+                    {
+                        if (upgrade.UpgradeType != Upgrade.Type.Invalid)
+                        {
+                            gearMenu.addButton(upgrade.Name, () => Cheats.giveUpgrade(upgrade, gear));
+                        }
+                    }
+                }
+            }
+            foreach (var character in Global.Instance.Characters)
+            {
+                if (character.Info != null && character.Info.Upgrades.Count > 0)
+                {
+                    MenuMod2Menu charMenu = new MenuMod2Menu(character.Info.Name + "_SelectUpgrade", specificUpgradeSelect);
+                    charMenu.thisButton.changeName(character.Info.Name);
+
+                    Color color = Color.red;
+                    if (PlayerData.GetGearData(character).IsUnlocked)
+                         color = Color.green;
+                    else if (PlayerData.GetGearData(character).IsCollected)
+                         color = Color.yellow;
+                    charMenu.addButton("Give All Upgrades", () => Cheats.giveAllUpgradesForGear(character)).changeColour(color);
+
+                    foreach (var upgrade in character.Info.Upgrades)
+                    {
+                        if (upgrade.UpgradeType != Upgrade.Type.Invalid)
+                        {
+                            charMenu.addButton(upgrade.Name, () => Cheats.giveUpgrade(upgrade, character));
+                        }
+                    }
                 }
             }
 
