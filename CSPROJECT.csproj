@@ -275,6 +275,6 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="copy &quot;$(TargetPath)&quot; &quot;%USERPROFILE%\AppData\Roaming\r2modmanPlus-local\Mycopunk\profiles\Default\BepInEx\plugins\$(TargetFileName)&quot;" />
+        <Exec Command="copy &quot;$(TargetPath)&quot; &quot;%USERPROFILE%\AppData\Roaming\r2modmanPlus-local\Mycopunk\profiles\Default\BepInEx\plugins\$(TargetFileName)&quot;" ContinueOnError="true" />
     </Target>
 </Project>

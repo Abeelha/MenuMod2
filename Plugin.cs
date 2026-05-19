@@ -17,7 +17,7 @@ public class SparrohPlugin : BaseUnityPlugin
     public const string PluginGUID = "sparroh.cheatmenu";
     public const string PluginName = "CheatMenu";
     public const string PluginVersion = "1.0.0";
-    
+
     public static ManualLogSource Logger;
     public InputActionMap _actionmap;
     private InputAction _openMenu;
@@ -47,7 +47,7 @@ public class SparrohPlugin : BaseUnityPlugin
         _openMenu = _actionmap.AddAction("OpenMenu");
         _openMenu.AddBinding("<Keyboard>/backquote");
         _openMenu.performed += _ => toggleMenu();
-        
+
         Logger.LogInfo($"{PluginName} loaded");
     }
 
@@ -70,13 +70,7 @@ public class SparrohPlugin : BaseUnityPlugin
         }
 
         int profileIndex = (int)field.GetValue(PlayerData.ProfileConfig.Instance);
-        if (profileIndex == 0)
-        {
-            Logger.LogWarning(
-                $"Using default profile is not supported.  Please switch to a different profile on the main menu.");
-            _actionmap.Disable();
-            return;
-        }
+
 
         createMainMenu();
         _actionmap.Enable();
@@ -91,7 +85,7 @@ public class SparrohPlugin : BaseUnityPlugin
             {
                 return;
             }
-            
+
             if (Global.Instance != null)
             {
             }
@@ -178,10 +172,7 @@ public class SparrohPlugin : BaseUnityPlugin
                         if (field != null)
                         {
                             int profileIndex = (int)field.GetValue(PlayerData.ProfileConfig.Instance);
-                            if (profileIndex != 0)
-                            {
-                                createMainMenu();
-                            }
+                            createMainMenu();
                         }
                     }
                 }
